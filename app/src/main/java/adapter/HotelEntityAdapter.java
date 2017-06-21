@@ -26,6 +26,16 @@ public class HotelEntityAdapter extends SectionedRecyclerViewAdapter<HeaderHolde
 
     private SparseBooleanArray mBooleanMap;
 
+    //自定义监听事件
+    public static interface OnRecyclerViewItemClickListener {
+        void onItemClick(int group, int childPosition, HotelEntity.TagsEntity.TagInfo tagInfo);
+//        void onItemLongClick(View view);
+    }
+    private OnRecyclerViewItemClickListener mOnItemClickListener = null;
+    public void setOnItemClickListener(OnRecyclerViewItemClickListener listener) {
+        mOnItemClickListener = listener;
+    }
+
     public HotelEntityAdapter(Context context) {
         mContext = context;
         mInflater = LayoutInflater.from(context);
@@ -45,10 +55,9 @@ public class HotelEntityAdapter extends SectionedRecyclerViewAdapter<HeaderHolde
     @Override
     protected int getItemCountForSection(int section) {
         int count = allTagList.get(section).tagInfoList.size();
-        if (count >= 8 && !mBooleanMap.get(section)) {
-            count = 8;
-        }
-
+//        if (count >= 8 && !mBooleanMap.get(section)) {
+//            count = 8;
+//        }
         return HotelUtils.isEmpty(allTagList.get(section).tagInfoList) ? 0 : count;
     }
 
@@ -77,19 +86,19 @@ public class HotelEntityAdapter extends SectionedRecyclerViewAdapter<HeaderHolde
 
     @Override
     protected void onBindSectionHeaderViewHolder(final HeaderHolder holder, final int section) {
-        holder.openView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean isOpen = mBooleanMap.get(section);
-                String text = isOpen ? "展开" : "关闭";
-                mBooleanMap.put(section, !isOpen);
-                holder.openView.setText(text);
-                notifyDataSetChanged();
-            }
-        });
+//        holder.openView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                boolean isOpen = mBooleanMap.get(section);
+//                String text = isOpen ? "展开" : "关闭";
+//                mBooleanMap.put(section, !isOpen);
+//                holder.openView.setText(text);
+//                notifyDataSetChanged();
+//            }
+//        });
 
         holder.titleView.setText(allTagList.get(section).tagsName);
-        holder.openView.setText(mBooleanMap.get(section) ? "关闭" : "展开");
+//        holder.openView.setText(mBooleanMap.get(section) ? "关闭" : "展开");
 
     }
 
@@ -100,8 +109,17 @@ public class HotelEntityAdapter extends SectionedRecyclerViewAdapter<HeaderHolde
     }
 
     @Override
-    protected void onBindItemViewHolder(DescHolder holder, int section, int position) {
-        holder.descView.setText(allTagList.get(section).tagInfoList.get(position).tagName);
+    protected void onBindItemViewHolder(DescHolder holder, final int section, final int position) {
+        final HotelEntity.TagsEntity.TagInfo tagInfo = allTagList.get(section).tagInfoList.get(position);
+        holder.descView.setText(tagInfo.tagName);
+        holder.descView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (null != mOnItemClickListener) {
+                    mOnItemClickListener.onItemClick(section, position, tagInfo);
+                }
+            }
+        });
 
     }
 }

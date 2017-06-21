@@ -61,6 +61,7 @@ public abstract class SectionedRecyclerViewAdapter<H extends RecyclerView.ViewHo
         return count;
     }
 
+
     private void setupIndices(){
         count = countItems();
         allocateAuxiliaryArrays(count);
